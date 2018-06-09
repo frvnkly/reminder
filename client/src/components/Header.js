@@ -1,21 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 const header = props => {
-  let loginLogout = null;
-  switch(props.auth) {
-    case null:
-      break;
-    case false:
-      loginLogout = <a href='/auth/google'>Login</a>;
-      break;
-    default:
-      loginLogout = <a href='/auth/logout'>Logout</a>;
+  let loginLogout = <a href='/auth/google'>Login</a>;
+  if (props.auth) {
+    loginLogout = <a href='/auth/logout'>Logout</a>;
   }
 
   return (
     <nav className='orange'>
       <div className='nav-wrappper container'>
+        <Link to='/'className='left brand-logo'>Reminder</Link>
         <ul>
           <li className='right'>
             {loginLogout}

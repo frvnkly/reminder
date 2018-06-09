@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import Header from './Header';
+import Landing from './Landing';
+import Dashboard from './Dashboard';
 import { fetchUser } from '../actions/authActions';
 
 class App extends Component {
@@ -15,6 +17,8 @@ class App extends Component {
       <BrowserRouter>
         <div className="App">
           <Header />
+          <Route path='/' exact component={Landing} />
+          <Route path='/dashboard' component={Dashboard} />
         </div>
       </BrowserRouter>
     );
