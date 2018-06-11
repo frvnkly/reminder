@@ -1,24 +1,59 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { connect} from 'react-redux';
 
-const dashboard = props => {
-  let content = <Redirect to='/' />;
+import Modal from './ui/Modal';
 
-  if (props.auth) {
-    content = (
-      <div className='container'>
-        Dashboard
-        <div className='fixed-action-btn'>
-          <a className='btn-floating btn-large red'>
-            <i className='material-icons'>add</i>
-          </a>
-        </div>
-      </div>
-    );
+class Dashboard extends Component {
+  state = {
+    showModal: false,
   }
 
-  return content;
+  addButtonHandler = () => {
+    this.setState({ showModal: true });
+  }
+
+  modalBackdropClickHandler = () => {
+    this.setState({ showModal: false });
+  }
+
+  modalEscapeHandler = event => {
+    if (event.key === 'Escape') {
+      this.setState({ showModal: false });
+    }
+  }
+
+  render() {
+    let content = <Redirect to='/' />;
+
+    if (this.props.auth) {
+
+
+      content = (
+        <div className='container'>
+          Dashboard
+          {this.state.showModal
+            ? <Modal 
+                clicked={this.modalBackdropClickHandler} 
+                escaped={this.modalEscapeHandler}>
+                  Hello
+              </Modal>
+            : null}
+          {this.state.showModal
+            ? null
+            : <div className='fixed-action-btn'>
+                <a 
+                  className='btn-floating btn-large red' 
+                  onClick={this.addButtonHandler}>
+                    <i className='material-icons'>add</i>
+                </a>
+              </div>}
+        </div>
+      );
+    }
+
+    return content;
+  }
 };
 
 const mapStateToProps = ({ auth }) => {
@@ -27,4 +62,4 @@ const mapStateToProps = ({ auth }) => {
   };
 };
 
-export default connect(mapStateToProps)(dashboard);
+export default connect(mapStateToProps)(Dashboard);

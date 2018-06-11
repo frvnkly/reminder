@@ -1,3 +1,7 @@
+const sendgrid = require('@sendgrid/mail');
+
+const keys = require('../config/keys');
+
 module.exports = app => {
   app.get(
     '/api/reminders',
@@ -7,16 +11,23 @@ module.exports = app => {
   );
 
   app.post(
-    '/api/reminders/create',
+    '/api/reminders',
     (req, res) => {
-      res.send('schedule reminder');
+      scheduleEmailReminder(req.body);
+      res.send({});
     }
   );
 
-  app.post(
-    '/api/reminders/cancel',
+  app.delete(
+    '/api/reminders',
     (req, res) => {
       res.send('cancel reminder');
     }
   );
 };
+
+function scheduleEmailReminder(reminderForm) {
+  sendgrid.setApiKey(keys.sendgridKey);
+  const mail = { ...reminderForm };
+  sendgrid.send(mail);
+}
