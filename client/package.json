@@ -21,6 +21,9 @@
   },
   "proxy": {
     "/auth/*": {
+      "target": "http://localhost:5000/"
+    },
+    "/api/reminders": {
       "target": "http://localhost:5000"
     }
   }

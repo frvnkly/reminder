@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { connect} from 'react-redux';
 
 import Modal from './ui/Modal';
+import EmailForm from './reminderForms/EmailForm';
 
 class Dashboard extends Component {
   state = {
@@ -13,30 +14,27 @@ class Dashboard extends Component {
     this.setState({ showModal: true });
   }
 
-  modalBackdropClickHandler = () => {
+  modalCloseHandler = () => {
     this.setState({ showModal: false });
-  }
-
-  modalEscapeHandler = event => {
-    if (event.key === 'Escape') {
-      this.setState({ showModal: false });
-    }
   }
 
   render() {
     let content = <Redirect to='/' />;
 
     if (this.props.auth) {
-
-
       content = (
         <div className='container'>
-          Dashboard
+          <button 
+            className='btn-large hide-on-med-and-down' 
+            style={{ display: 'block', margin: '20px auto 20px auto' }}
+            onClick={this.addButtonHandler}>
+              Schedule Reminder
+          </button>
           {this.state.showModal
             ? <Modal 
-                clicked={this.modalBackdropClickHandler} 
+                close={this.modalCloseHandler} 
                 escaped={this.modalEscapeHandler}>
-                  Hello
+                  <EmailForm cancelled={this.modalCloseHandler} />
               </Modal>
             : null}
           {this.state.showModal

@@ -1,15 +1,9 @@
 .Modal {
     position: absolute;
     margin: auto;
+    padding: 0;
     top: 15%;
     text-align: center;
     background-color: white;
     z-index: 200;
-    width: 80%;
-}
-
-@media (min-width: 500px) {
-    .Modal {
-        width: 50%;
-    }
 }

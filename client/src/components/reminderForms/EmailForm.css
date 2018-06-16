@@ -1,0 +1,12 @@
+.EmailForm {
+    box-sizing: border-box;
+    padding: 20px;
+    width: 80vw
+}
+
+@media (min-width: 500px) {
+    .EmailForm {
+        padding: 50px;
+        width: 50vw;
+    }
+}
