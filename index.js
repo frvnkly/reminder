@@ -5,12 +5,14 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 
 const keys = require('./config/keys');
+const ReminderManager = require('./services/ReminderManager');
 require('./model/User');
 require('./services/passport');
 
 mongoose.connect(keys.mongoURI);
 
 const app = express();
+app.reminders = new ReminderManager();
 
 app.use(bodyParser.json());
 app.use(cookieSession({

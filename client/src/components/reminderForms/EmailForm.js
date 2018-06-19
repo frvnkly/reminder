@@ -6,6 +6,11 @@ import './EmailForm.css';
 class EmailForm extends Component {
   state = {
     form: {
+      time: {
+        type: 'datetime-local',
+        placeholder: 'Time',
+        value: ''
+      },
       email: {
         type: 'email',
         placeholder: 'Email',
@@ -34,13 +39,19 @@ class EmailForm extends Component {
   }
 
   submitForm = () => {
+    const time = new Date(this.state.form.time.value).valueOf();
     const formData = {
-      to: this.state.form.email.value,
-      from: this.state.form.email.value,
-      subject: this.state.form.subject.value,
-      text: this.state.form.body.value
+      type: 'email',
+      time: time,
+      reminderData: {
+        to: this.state.form.email.value,
+        from: this.state.form.email.value,
+        subject: this.state.form.subject.value,
+        text: this.state.form.body.value
+      }
     };
-    axios.post('/api/reminders', formData);
+    axios.post('/api/reminders', formData)
+      .then(this.props.close);
   }
 
   renderForm() {
@@ -65,7 +76,6 @@ class EmailForm extends Component {
               placeholder={formConfig[field].placeholder}
               id={field}
               type={formConfig[field].type}
-              className='validate'
               value={this.state.form[field].value}
               onChange={event => this.inputChangeHandler(event, field)} />
           </div>
@@ -78,7 +88,7 @@ class EmailForm extends Component {
           {formFields}
           <div className='row'>
             <div className='col s6'>
-              <a className='btn' onClick={this.props.cancelled}>Cancel</a>
+              <a className='btn' onClick={this.props.close}>Cancel</a>
             </div>
             <div className='col s6'>
               <a className='btn' onClick={this.submitForm}>Submit</a>

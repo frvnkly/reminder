@@ -34,7 +34,7 @@ class Dashboard extends Component {
             ? <Modal 
                 close={this.modalCloseHandler} 
                 escaped={this.modalEscapeHandler}>
-                  <EmailForm cancelled={this.modalCloseHandler} />
+                  <EmailForm close={this.modalCloseHandler} />
               </Modal>
             : null}
           {this.state.showModal

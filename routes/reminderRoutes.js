@@ -13,7 +13,12 @@ module.exports = app => {
   app.post(
     '/api/reminders',
     (req, res) => {
-      scheduleEmailReminder(req.body);
+      if (req.body.type === 'email') {
+        app.reminders.scheduleEmailReminder(
+          req.body.reminderData, 
+          req.body.time
+        );
+      };
       res.send({});
     }
   );
@@ -25,9 +30,3 @@ module.exports = app => {
     }
   );
 };
-
-function scheduleEmailReminder(reminderForm) {
-  sendgrid.setApiKey(keys.sendgridKey);
-  const mail = { ...reminderForm };
-  sendgrid.send(mail);
-}
