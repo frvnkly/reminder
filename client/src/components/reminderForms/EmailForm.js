@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import './EmailForm.css';
+import FormError from './FormError';
 
 class EmailForm extends Component {
   state = {
@@ -9,33 +10,108 @@ class EmailForm extends Component {
       time: {
         type: 'datetime-local',
         placeholder: 'Time',
-        value: ''
+        value: '',
+        valid: false,
+        touched: false,
+        errors: [],
       },
       email: {
         type: 'email',
         placeholder: 'Email',
-        value: ''
+        value: '',
+        valid: false,
+        touched: false,
+        errors: [],
       },
       subject: {
         type: 'text',
         placeholder: 'Subject',
-        value: ''
+        value: '',
+        valid: true,
+        touched: false,
+        errors: [],
       },
       body: {
-        type: 'textarea',
+        type: 'text',
         placeholder: 'Body',
-        value: ''
+        value: '',
+        valid: true,
+        touched: false,
+        errors: [],
       },
-    }
+    },
+    formValid: false,
   }
 
   inputChangeHandler = (event, id) => {
     const updatedValue = event.target.value;
     this.setState(prevState => {
-      const updatedForm = { ...prevState.form };
-      updatedForm[id].value = updatedValue;
+      const updatedForm = { 
+        ...prevState.form,
+        [id]: { 
+          ...prevState.form[id],
+          value: updatedValue,
+          touched: true,
+        },
+      };
       return { form: updatedForm };
-    });
+    }, () => this.validateField(id));
+  }
+
+  validateField = id => {
+    let fieldValid = false;
+    const errors = [];
+    switch (id) {
+      case 'time':
+        const hasTime = this.state.form.time.value !== '';
+        if (!hasTime) {
+          errors.push('Required');
+        }
+        const isFuture = new Date(this.state.form.time.value) > Date.now();
+        if (!isFuture) {
+          errors.push('Please enter a date and time in the future');
+        }
+        fieldValid = hasTime && isFuture;
+        break;
+      case 'email':
+        const hasEmail = this.state.form.email.value !== '';
+        if (!hasEmail) {
+          errors.push('Required');
+        }
+        const isEmail = this.state.form.email.value.match(
+          // eslint-disable-next-line
+          /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+        if (!isEmail) {
+          errors.push('Please enter a valid email address');
+        }
+        fieldValid = hasEmail && isEmail;
+        break;
+      default:
+        return
+    }
+
+    this.setState(prevState => {
+      const updatedForm = {
+        ...this.state.form,
+        [id]: { 
+          ...this.state.form[id],
+          valid: fieldValid,
+          errors: errors },
+      };
+      return { form: updatedForm };
+    }, this.validateForm);
+  }
+
+  validateForm = () => {
+    let formValid = true;
+    for (const field in this.state.form) {
+      if (!this.state.form[field].valid) {
+        formValid = false;
+        break;
+      }
+    }
+    this.setState({ formValid });
   }
 
   submitForm = () => {
@@ -58,29 +134,26 @@ class EmailForm extends Component {
     const formFields = [];
     const formConfig = this.state.form;
     for (const field in formConfig) {
-      if (formConfig[field].type === 'textarea') {
-        formFields.push(
-          <div className='input-field' key={field}>
-            <textarea
-              placeholder={formConfig[field].placeholder}
-              id={field}
-              className='materialize-textarea'
-              value={this.state.form[field].value}
-              onChange={event => this.inputChangeHandler(event, field)} />
-          </div>
-        );
-      } else {
-        formFields.push(
-          <div className='input-field' key={field}>
-            <input
-              placeholder={formConfig[field].placeholder}
-              id={field}
-              type={formConfig[field].type}
-              value={this.state.form[field].value}
-              onChange={event => this.inputChangeHandler(event, field)} />
-          </div>
-        );
+      let validState = null;
+      if (this.state.form[field].touched) {
+        if (this.state.form[field].valid) {
+          validState = 'valid';
+        } else {
+          validState = 'invalid';
+        }
       }
+      formFields.push(
+        <div className='input-field' key={field}>
+          <input
+            className={validState}
+            placeholder={formConfig[field].placeholder}
+            id={field}
+            type={formConfig[field].type}
+            value={this.state.form[field].value}
+            onChange={event => this.inputChangeHandler(event, field)} />
+          <FormError errors={this.state.form[field].errors} />
+        </div>
+      );
     }
 
     return (
@@ -91,7 +164,12 @@ class EmailForm extends Component {
               <a className='btn' onClick={this.props.close}>Cancel</a>
             </div>
             <div className='col s6'>
-              <a className='btn' onClick={this.submitForm}>Submit</a>
+              <a 
+                className='btn' 
+                onClick={this.submitForm} 
+                disabled={!this.state.formValid}>
+                  Submit
+              </a>
             </div>
           </div>
         </form>
