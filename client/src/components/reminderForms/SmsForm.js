@@ -4,7 +4,7 @@ import axios from 'axios';
 import './ReminderForm.css';
 import FormError from './FormError';
 
-class EmailForm extends Component {
+class SmsForm extends Component {
   state = {
     form: {
       time: {
@@ -16,21 +16,12 @@ class EmailForm extends Component {
         touched: false,
         errors: [],
       },
-      email: {
-        type: 'email',
-        icon: 'email',
-        placeholder: 'Email',
+      phone: {
+        type: 'tel',
+        icon: 'smartphone',
+        placeholder: 'Phone Number (+1234567890)',
         value: '',
         valid: false,
-        touched: false,
-        errors: [],
-      },
-      subject: {
-        type: 'text',
-        icon: 'event_note',
-        placeholder: 'Subject',
-        value: '',
-        valid: true,
         touched: false,
         errors: [],
       },
@@ -77,19 +68,21 @@ class EmailForm extends Component {
         }
         fieldValid = hasTime && isFuture;
         break;
-      case 'email':
-        const hasEmail = this.state.form.email.value !== '';
-        if (!hasEmail) {
+      case 'phone':
+        const hasPhone = this.state.form.phone.value !== '';
+        if (!hasPhone) {
           errors.push('Required');
         }
-        const isEmail = this.state.form.email.value.match(
-          // eslint-disable-next-line
-          /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        const isPhoneNumber = this.state.form.phone.value.match(
+          /[+][0-9]{10}/
         );
-        if (!isEmail) {
-          errors.push('Please enter a valid email address');
+        if (!isPhoneNumber) {
+          errors.push(
+            `Please enter a valid 10-digit phone number 
+            in the form of +1234567890`
+          );
         }
-        fieldValid = hasEmail && isEmail;
+        fieldValid = hasPhone && isPhoneNumber;
         break;
       default:
         return
@@ -121,13 +114,11 @@ class EmailForm extends Component {
   submitForm = () => {
     const time = new Date(this.state.form.time.value).valueOf();
     const formData = {
-      type: 'email',
+      type: 'sms',
       time: time,
       reminderData: {
-        to: this.state.form.email.value,
-        from: this.state.form.email.value,
-        subject: this.state.form.subject.value,
-        text: this.state.form.body.value
+        to: this.state.form.phone.value,
+        body: this.state.form.body.value
       }
     };
     axios.post('/api/reminders', formData)
@@ -184,11 +175,11 @@ class EmailForm extends Component {
   render() {
     return (
       <div className='ReminderForm'>
-        <h5>Schedule an Email Reminder</h5>
+        <h5>Schedule a Text Reminder</h5>
         {this.renderForm()}
       </div>
     );
   }
 }
 
-export default EmailForm;
+export default SmsForm;

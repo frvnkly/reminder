@@ -1,11 +1,11 @@
-.EmailForm {
+.ReminderForm {
     box-sizing: border-box;
     padding: 20px;
     width: 80vw
 }
 
 @media (min-width: 500px) {
-    .EmailForm {
+    .ReminderForm {
         padding: 50px;
         width: 50vw;
     }

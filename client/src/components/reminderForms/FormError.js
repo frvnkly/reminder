@@ -6,7 +6,7 @@ const formError = props => {
   }
 
   const css = {
-    textAlign: 'left',
+    // textAlign: 'left',
     marginTop: '0',
     paddingTop: '0',
   };
