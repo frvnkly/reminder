@@ -5,6 +5,7 @@ import { connect} from 'react-redux';
 import Modal from './ui/Modal';
 import EmailForm from './reminderForms/EmailForm';
 import SmsForm from './reminderForms/SmsForm';
+import ReminderList from './ReminderList';
 
 class Dashboard extends Component {
   state = {
@@ -101,11 +102,12 @@ class Dashboard extends Component {
             </button>
             <button 
               className='btn-large' 
-              style={{ display: 'block', margin: '10px auto 20px auto', width: '325px' }}
+              style={{ display: 'block', margin: '10px auto 50px auto', width: '325px' }}
               onClick={() => this.openModalHandler('smsForm')}>
                 <i className='material-icons left'>sms</i>Schedule Text Reminder
             </button>
           </div>
+          <ReminderList />
           {modal}
           {buttonGroup}
         </div>
