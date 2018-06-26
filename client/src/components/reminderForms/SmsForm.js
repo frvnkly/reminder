@@ -28,7 +28,7 @@ class SmsForm extends Component {
       body: {
         type: 'text',
         icon: 'message',
-        placeholder: 'Body',
+        placeholder: 'Body (optional)',
         value: '',
         valid: true,
         touched: false,
@@ -64,7 +64,7 @@ class SmsForm extends Component {
         }
         const isFuture = new Date(this.state.form.time.value) > Date.now();
         if (!isFuture) {
-          errors.push('Please enter a date and time in the future');
+          errors.push('Please enter a valid date and time in the future');
         }
         fieldValid = hasTime && isFuture;
         break;

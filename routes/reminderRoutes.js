@@ -1,7 +1,3 @@
-const sendgrid = require('@sendgrid/mail');
-
-const keys = require('../config/keys');
-
 module.exports = app => {
   app.get(
     '/api/reminders',
@@ -16,7 +12,8 @@ module.exports = app => {
       if (req.body.type === 'email') {
         app.reminders.scheduleEmailReminder(
           req.body.reminderData, 
-          req.body.time
+          req.body.time,
+          req.user.id
         );
       };
       res.send({});

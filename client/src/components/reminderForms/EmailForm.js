@@ -19,7 +19,7 @@ class EmailForm extends Component {
       email: {
         type: 'email',
         icon: 'email',
-        placeholder: 'Email',
+        placeholder: 'Email Address',
         value: '',
         valid: false,
         touched: false,
@@ -28,7 +28,7 @@ class EmailForm extends Component {
       subject: {
         type: 'text',
         icon: 'event_note',
-        placeholder: 'Subject',
+        placeholder: 'Subject (optional)',
         value: '',
         valid: true,
         touched: false,
@@ -37,7 +37,7 @@ class EmailForm extends Component {
       body: {
         type: 'text',
         icon: 'message',
-        placeholder: 'Body',
+        placeholder: 'Body (optional)',
         value: '',
         valid: true,
         touched: false,
@@ -73,7 +73,7 @@ class EmailForm extends Component {
         }
         const isFuture = new Date(this.state.form.time.value) > Date.now();
         if (!isFuture) {
-          errors.push('Please enter a date and time in the future');
+          errors.push('Please enter a valid date and time in the future');
         }
         fieldValid = hasTime && isFuture;
         break;

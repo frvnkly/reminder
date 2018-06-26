@@ -1,7 +1,10 @@
+const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const sendgrid = require('@sendgrid/mail');
 const twilio = require('twilio');
 const keys = require('../config/keys');
+
+const Reminder = mongoose.model('reminders');
 
 class ReminderManager {
   constructor() {
@@ -14,11 +17,27 @@ class ReminderManager {
     this._twilio = new twilio(keys.twilioSID, keys.twilioToken);
   }
 
-  scheduleEmailReminder(reminderData, timeString) {
+  scheduleEmailReminder(reminderData, timeString, userId) {
+    // create reminder document
+    const reminder = new Reminder({
+      type: 'email',
+      scheduledFor: timeString,
+      to: reminderData.to,
+      subject: reminderData.subject,
+      body: reminderData.text,
+      _user: userId
+    });
+
+    // schedule reminder
     const time = new Date(timeString);
-    schedule.scheduleJob(time, () => {
+    const j = schedule.scheduleJob(time, () => {
+      this._cleanUpReminder(reminder._id);
       sendgrid.send(reminderData);
     });
+
+    // enter reminder into manager and database
+    this._reminders.set(reminder._id, j);
+    reminder.save();
   }
 
   scheduleTextReminder(reminderData, timeString) {
@@ -29,6 +48,13 @@ class ReminderManager {
         ...reminderData,
       });
     });
+  }
+
+  _cleanUpReminder(id) {
+    // remove from manager
+    this._reminders.delete(id);
+    // remove from database
+    Reminder.findByIdAndRemove(id).exec();
   }
 }
 

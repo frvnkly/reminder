@@ -92,18 +92,20 @@ class Dashboard extends Component {
 
       content = (
         <div className='container'>
-          <button 
-            className='btn-large hide-on-med-and-down' 
-            style={{ display: 'block', margin: '50px auto 10px auto', width: '325px' }}
-            onClick={() => this.openModalHandler('emailForm')}>
-              <i className='material-icons left'>email</i>Schedule Email Reminder
-          </button>
-          <button 
-            className='btn-large hide-on-med-and-down' 
-            style={{ display: 'block', margin: '10px auto 20px auto', width: '325px' }}
-            onClick={() => this.openModalHandler('smsForm')}>
-              <i className='material-icons left'>sms</i>Schedule Text Reminder
-          </button>
+          <div className='hide-on-med-and-down'>
+            <button 
+              className='btn-large' 
+              style={{ display: 'block', margin: '50px auto 10px auto', width: '325px' }}
+              onClick={() => this.openModalHandler('emailForm')}>
+                <i className='material-icons left'>email</i>Schedule Email Reminder
+            </button>
+            <button 
+              className='btn-large' 
+              style={{ display: 'block', margin: '10px auto 20px auto', width: '325px' }}
+              onClick={() => this.openModalHandler('smsForm')}>
+                <i className='material-icons left'>sms</i>Schedule Text Reminder
+            </button>
+          </div>
           {modal}
           {buttonGroup}
         </div>

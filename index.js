@@ -5,10 +5,11 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 
 const keys = require('./config/keys');
-const ReminderManager = require('./services/ReminderManager');
 require('./model/User');
+require('./model/Reminder');
 require('./services/passport');
 
+const ReminderManager = require('./services/ReminderManager');
 mongoose.connect(keys.mongoURI);
 
 const app = express();
