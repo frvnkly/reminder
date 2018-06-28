@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 
 import './ReminderForm.css';
 import FormError from './FormError';
+import { fetchReminders } from '../../actions/reminderActions';
 
 class EmailForm extends Component {
   state = {
@@ -118,7 +120,7 @@ class EmailForm extends Component {
     this.setState({ formValid });
   }
 
-  submitForm = () => {
+  submitForm = async () => {
     const time = new Date(this.state.form.time.value).valueOf();
     const formData = {
       type: 'email',
@@ -130,8 +132,9 @@ class EmailForm extends Component {
         text: this.state.form.body.value
       }
     };
-    axios.post('/api/reminders', formData)
-      .then(this.props.close);
+    await axios.post('/api/reminders', formData);
+    await this.props.fetchReminders();
+    this.props.close();
   }
 
   renderForm() {
@@ -191,4 +194,4 @@ class EmailForm extends Component {
   }
 }
 
-export default EmailForm;
+export default connect(null, { fetchReminders })(EmailForm);

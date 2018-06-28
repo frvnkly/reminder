@@ -31,8 +31,10 @@ module.exports = app => {
 
   app.delete(
     '/api/reminders',
+    requireLogin,
     (req, res) => {
-      res.send('cancel reminder');
+      app.reminders.cancelReminder(req.body.id);
+      res.send({});
     }
   );
 };

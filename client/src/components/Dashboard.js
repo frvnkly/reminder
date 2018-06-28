@@ -63,10 +63,11 @@ class Dashboard extends Component {
               alignItems: 'center',
               flexDirection: 'column-reverse', 
               right: '23px', 
-              bottom: '23px' }}
+              bottom: '23px',
+              zIndex: '2' }}
             className='hide-on-large-only'>
               <a 
-                className='btn-floating btn-large red' 
+                className='btn-floating btn-large orange' 
                 onClick={this.buttonMenuHandler}>
                   <i className='material-icons'>add</i>
               </a>

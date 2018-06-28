@@ -36,7 +36,7 @@ class ReminderManager {
     });
 
     // enter reminder into manager and database
-    this._reminders.set(reminder._id, j);
+    this._reminders.set(reminder._id.toString(), j);
     reminder.save();
   }
 
@@ -48,6 +48,13 @@ class ReminderManager {
         ...reminderData,
       });
     });
+  }
+
+  cancelReminder(id) {
+    // cancel job
+    this._reminders.get(id).cancel();
+    // clear bookkeeping
+    this._cleanUpReminder(id);
   }
 
   _cleanUpReminder(id) {

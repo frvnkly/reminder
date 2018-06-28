@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 import { fetchReminders } from '../actions/reminderActions';
 
 class ReminderList extends Component {
   componentDidMount() {
+    this.props.fetchReminders();
+  }
+
+  cancelReminderHandler = async reminderId => {
+    await axios.delete('/api/reminders', { data: { id: reminderId } });
     this.props.fetchReminders();
   }
 
@@ -17,8 +23,15 @@ class ReminderList extends Component {
           <div className='card-content'>
             <span className='card-title'>Scheduled for {scheduledFor}</span>
             <p><b className='orange-text'>to</b> {reminder.to}</p>
-            {reminder.subject ? <p><b className='orange-text'>subject</b> {reminder.subject}</p> :null}
-            {reminder.body ? <i>{reminder.body}</i> : null}
+            {reminder.subject 
+              ? <p><b className='orange-text'>subject</b> {reminder.subject}</p>
+              : null}
+            {reminder.body 
+              ? <blockquote><i>{reminder.body}</i></blockquote> 
+              : null}
+            <a className="btn-floating red right" onClick={() => this.cancelReminderHandler(reminder._id)}>
+              <i className="material-icons">close</i>
+            </a>
           </div>
         </div>
       );
@@ -27,8 +40,12 @@ class ReminderList extends Component {
   }
 
   render() {
-    console.log(this.props.reminders);
-    return this.renderReminders();
+    return (
+      <div>
+        <h5 className='grey-text center-align'>PENDING</h5>
+        {this.renderReminders()}
+      </div>
+    );
   }
 }
 
