@@ -125,7 +125,7 @@ class EmailForm extends Component {
     const formData = {
       type: 'email',
       time: time,
-      reminderData: {
+      message: {
         to: this.state.form.email.value,
         from: this.state.form.email.value,
         subject: this.state.form.subject.value,

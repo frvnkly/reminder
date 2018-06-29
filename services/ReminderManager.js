@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const sendgrid = require('@sendgrid/mail');
-const twilio = require('twilio');
 const keys = require('../config/keys');
 
 const Reminder = mongoose.model('reminders');
@@ -9,52 +8,58 @@ const Reminder = mongoose.model('reminders');
 class ReminderManager {
   constructor() {
     this._reminders = new Map();
-
     // sendgrid
     sendgrid.setApiKey(keys.sendgridKey);
-
     // twilio
-    this._twilio = new twilio(keys.twilioSID, keys.twilioToken);
+    this._twilio = require('twilio')(keys.twilioSID, keys.twilioToken);
   }
 
-  scheduleEmailReminder(reminderData, timeString, userId) {
+  scheduleReminder(reminderData, userId=null) {
     // create reminder document
     const reminder = new Reminder({
-      type: 'email',
-      scheduledFor: timeString,
-      to: reminderData.to,
-      subject: reminderData.subject,
-      body: reminderData.text,
+      type: reminderData.type,
+      scheduledFor: reminderData.time,
+      to: reminderData.message.to,
+      subject: reminderData.message.subject,
+      body: reminderData.message.body || reminderData.message.text,
       _user: userId
     });
 
     // schedule reminder
-    const time = new Date(timeString);
+    const time = new Date(reminderData.time);
     const j = schedule.scheduleJob(time, () => {
       this._cleanUpReminder(reminder._id);
-      sendgrid.send(reminderData);
+      switch(reminder.type) {
+        case 'email':
+          this._sendEmail(reminderData.message);
+          break;
+        case 'sms':
+          this._sendText(reminderData.message);
+          break;
+        default:
+          return;
+      }
     });
 
-    // enter reminder into manager and database
-    this._reminders.set(reminder._id.toString(), j);
-    reminder.save();
-  }
-
-  scheduleTextReminder(reminderData, timeString) {
-    const time = new Date(timeString);
-    schedule.scheduleJob(time, () => {
-      this._twilio.messages.create({
-        from: keys.twilioNumber,
-        ...reminderData,
-      });
-    });
+    // enter reminder into manager and database if requested by existing user
+    if (userId) {
+      this._reminders.set(reminder._id.toString(), j);
+      reminder.save();
+    }
   }
 
   cancelReminder(id) {
     // cancel job
-    this._reminders.get(id).cancel();
+    const job = this._reminders.get(id);
+    if (job) {
+      job.cancel();
+    }
     // clear bookkeeping
     this._cleanUpReminder(id);
+  }
+
+  async _recoverReminders() {
+    const reminders = await Reminder.find({});
   }
 
   _cleanUpReminder(id) {
@@ -62,6 +67,28 @@ class ReminderManager {
     this._reminders.delete(id);
     // remove from database
     Reminder.findByIdAndRemove(id).exec();
+  }
+
+  _sendEmail(emailData) {
+    const email = { ...emailData };
+    if (!email.subject) {
+      email.subject = 'Reminder';
+    }
+    if (!email.text) {
+      email.text = ' ';
+    }
+    sendgrid.send(email);
+  }
+
+  _sendText(smsData) {
+    const sms = { ...smsData };
+    if (!sms.body) {
+      sms.body = 'Reminder';
+    }
+    sms.from = keys.twilioNumber;
+    this._twilio.messages
+      .create(sms)
+      .done();
   }
 }
 

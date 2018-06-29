@@ -18,13 +18,7 @@ module.exports = app => {
   app.post(
     '/api/reminders',
     (req, res) => {
-      if (req.body.type === 'email') {
-        app.reminders.scheduleEmailReminder(
-          req.body.reminderData, 
-          req.body.time,
-          req.user.id
-        );
-      };
+      app.reminders.scheduleReminder(req.body, req.user.id);
       res.send({});
     }
   );

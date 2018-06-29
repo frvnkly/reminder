@@ -75,14 +75,14 @@ class Dashboard extends Component {
                 ? <ul>
                     <li style={{ marginBottom: '15px' }}>
                       <a 
-                        className="btn-floating red" 
+                        className="btn-floating orange" 
                         onClick={() => this.openModalHandler('emailForm')}>
                           <i className="material-icons">email</i>
                       </a>
                     </li>
                     <li>
                       <a 
-                        className="btn-floating red"
+                        className="btn-floating orange"
                         onClick={() => this.openModalHandler('smsForm')}>
                           <i className="material-icons">sms</i>
                       </a>

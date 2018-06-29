@@ -76,7 +76,7 @@ class SmsForm extends Component {
           errors.push('Required');
         }
         const isPhoneNumber = this.state.form.phone.value.match(
-          /[+][0-9]{10}/
+          /[+][0-9]{11}/
         );
         if (!isPhoneNumber) {
           errors.push(
@@ -118,7 +118,7 @@ class SmsForm extends Component {
     const formData = {
       type: 'sms',
       time: time,
-      reminderData: {
+      message: {
         to: this.state.form.phone.value,
         body: this.state.form.body.value
       }
