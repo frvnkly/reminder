@@ -12,6 +12,9 @@ class ReminderManager {
     sendgrid.setApiKey(keys.sendgridKey);
     // twilio
     this._twilio = require('twilio')(keys.twilioSID, keys.twilioToken);
+
+    // recover previously scheduled reminders on server start
+    this._recoverReminders();
   }
 
   scheduleReminder(reminderData, userId=null) {
@@ -27,19 +30,7 @@ class ReminderManager {
 
     // schedule reminder
     const time = new Date(reminderData.time);
-    const j = schedule.scheduleJob(time, () => {
-      this._cleanUpReminder(reminder._id);
-      switch(reminder.type) {
-        case 'email':
-          this._sendEmail(reminderData.message);
-          break;
-        case 'sms':
-          this._sendText(reminderData.message);
-          break;
-        default:
-          return;
-      }
-    });
+    const j = schedule.scheduleJob(time, () => this._sendReminder(reminder));
 
     // enter reminder into manager and database if requested by existing user
     if (userId) {
@@ -59,7 +50,22 @@ class ReminderManager {
   }
 
   async _recoverReminders() {
-    const reminders = await Reminder.find({});
+    const reminders = await Reminder.find({}).sort({ scheduledFor: 1 });
+    reminders.forEach(reminder => {
+      // send out overdue reminders
+      if (reminder.scheduledFor <= Date.now()) {
+        if (!reminder.body) {
+          reminder.body = 'Reminder';
+        }
+        reminder.body += '\n\n**LATE**';
+        this._sendReminder(reminder);
+        this._cleanUpReminder(reminder._id);
+      } else {  // queue up pending reminders
+        const time = new Date(parseInt(reminder.scheduledFor, 10));
+        const j = schedule.scheduleJob(time, () => this._sendReminder(reminder));
+        this._reminders.set(reminder._id.toString(), j);
+      }
+    });
   }
 
   _cleanUpReminder(id) {
@@ -69,25 +75,42 @@ class ReminderManager {
     Reminder.findByIdAndRemove(id).exec();
   }
 
+  _sendReminder(reminder) {
+    const message = {
+      to: reminder.to,
+      subject: reminder.subject,
+      body: reminder.body,
+    };
+
+    switch(reminder.type) {
+      case 'email':
+        this._sendEmail(message);
+        break;
+      case 'sms':
+        this._sendText(message);
+        break;
+      default:
+    }
+
+    this._cleanUpReminder(reminder._id);
+  }
+
   _sendEmail(emailData) {
-    const email = { ...emailData };
-    if (!email.subject) {
-      email.subject = 'Reminder';
+    emailData.from = emailData.to;
+    emailData.text = emailData.body || ' ';
+    if (!emailData.subject) {
+      emailData.subject = 'Reminder';
     }
-    if (!email.text) {
-      email.text = ' ';
-    }
-    sendgrid.send(email);
+    sendgrid.send(emailData);
   }
 
   _sendText(smsData) {
-    const sms = { ...smsData };
-    if (!sms.body) {
-      sms.body = 'Reminder';
+    smsData.from = keys.twilioNumber;
+    if (!smsData.body) {
+      smsData.body = 'Reminder';
     }
-    sms.from = keys.twilioNumber;
     this._twilio.messages
-      .create(sms)
+      .create(smsData)
       .done();
   }
 }

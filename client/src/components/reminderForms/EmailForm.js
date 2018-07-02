@@ -133,7 +133,9 @@ class EmailForm extends Component {
       }
     };
     await axios.post('/api/reminders', formData);
-    await this.props.fetchReminders();
+    if (this.props.auth) {
+      await this.props.fetchReminders();
+    }
     this.props.close();
   }
 
@@ -194,4 +196,8 @@ class EmailForm extends Component {
   }
 }
 
-export default connect(null, { fetchReminders })(EmailForm);
+const mapStateToProps = ({ auth }) => {
+  return { auth };
+};
+
+export default connect(mapStateToProps, { fetchReminders })(EmailForm);

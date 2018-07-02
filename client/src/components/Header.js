@@ -11,7 +11,12 @@ const header = props => {
   return (
     <nav className='orange'>
       <div className='nav-wrappper container'>
-        <Link to='/'className='left brand-logo'>Reminder</Link>
+        <Link 
+          to='/' 
+          className='brand-logo' 
+          style={{ fontFamily: 'Lobster, cursive' }}>
+            Reminder
+        </Link>
         <ul>
           <li className='right'>
             {loginLogout}

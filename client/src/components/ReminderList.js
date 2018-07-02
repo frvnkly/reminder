@@ -49,15 +49,20 @@ class ReminderList extends Component {
 
   render() {
     return (
-      <div style={{ margin: '20px auto 100px auto' }}>
-        {this.renderReminders()}
-      </div>
+      this.props.auth
+      ? <div style={{ margin: '20px auto 100px auto' }}>
+          {this.renderReminders()}
+        </div>
+      : null
     );
   }
 }
 
 const mapStateToProps = state => {
-  return { reminders: state.reminders };
+  return { 
+    auth: state.auth,
+    reminders: state.reminders 
+  };
 };
 
 export default connect(mapStateToProps, { fetchReminders })(ReminderList);

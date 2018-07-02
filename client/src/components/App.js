@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import Header from './Header';
@@ -17,8 +17,8 @@ class App extends Component {
       <BrowserRouter>
         <div className="App">
           <Header />
-          <Route path='/' exact component={Landing} />
-          <Route path='/dashboard' component={Dashboard} />
+          <Landing />
+          <Dashboard />
         </div>
       </BrowserRouter>
     );

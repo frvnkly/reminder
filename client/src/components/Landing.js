@@ -1,16 +1,14 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 const landing = props => {
-  if (!(props.auth === false)) {
-    return <Redirect to='/dashboard' />;
-  }
-
   return (
-    <div className='container'>
-      Landing
-    </div>
+    !(props.auth)
+    ? <div className='container center-align'>
+        <h2>Reminder</h2>
+        <p>Schedule an email or text reminder!</p>
+      </div>
+    : null
   );
 };
 

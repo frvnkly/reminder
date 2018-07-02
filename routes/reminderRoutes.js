@@ -18,7 +18,8 @@ module.exports = app => {
   app.post(
     '/api/reminders',
     (req, res) => {
-      app.reminders.scheduleReminder(req.body, req.user.id);
+      const userId = req.user ? req.user.id : null;
+      app.reminders.scheduleReminder(req.body, userId);
       res.send({});
     }
   );
