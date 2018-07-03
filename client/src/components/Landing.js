@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 
 const landing = props => {
   return (
-    !(props.auth)
+    props.auth === false
     ? <div className='container center-align'>
-        <h2>Reminder</h2>
+        <h2 style={{ fontFamily: 'Lobster, cursive' }}>Reminder</h2>
         <p>Schedule an email or text reminder!</p>
       </div>
     : null

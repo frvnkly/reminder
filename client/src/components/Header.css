@@ -1,0 +1,32 @@
+.LoginMenu {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 170px;
+    box-sizing: border-box;
+    z-index: 200;
+}
+
+.LoginMenu li {
+    display: block;
+    float: none;
+}
+
+.LoginMenu li a {
+    color: black;
+}
+
+.LoginMenu li a:hover {
+    background-color: #ffa726;
+    color: white;
+}
+
+.LoginMenuClose {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    opacity: 0%;
+    z-index: 100;
+}
