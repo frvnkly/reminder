@@ -18,9 +18,13 @@ module.exports = app => {
   app.post(
     '/api/reminders',
     (req, res) => {
-      const userId = req.user ? req.user.id : null;
-      app.reminders.scheduleReminder(req.body, userId);
-      res.send({});
+      if (validateFormData(req.body)) {
+        const userId = req.user ? req.user.id : null;
+        app.reminders.scheduleReminder(req.body, userId);
+        res.end();
+      } else {
+        res.status(422).end();
+      }
     }
   );
 
@@ -32,4 +36,15 @@ module.exports = app => {
       res.send({});
     }
   );
+};
+
+const validateFormData = formData => {
+  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const phoneRegex = /[+][0-9]{11}/;
+
+  const timeValid = new Date(formData.time) > Date.now();
+  const typeValid = ['email', 'sms'].includes(formData.type);
+  const toValid = emailRegex.test(formData.message.to) || phoneRegex.test(formData.message.to);
+
+  return timeValid && typeValid && toValid;
 };

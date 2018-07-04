@@ -4,6 +4,9 @@ import axios from 'axios';
 
 import './ReminderForm.css';
 import FormError from './FormError';
+import SubmitSpinner from './SubmitSpinner';
+import SubmitSuccess from './SubmitSuccess';
+import SubmitError from './SubmitError';
 import { fetchReminders } from '../../actions/reminderActions';
 
 class SmsForm extends Component {
@@ -21,7 +24,7 @@ class SmsForm extends Component {
       phone: {
         type: 'tel',
         icon: 'smartphone',
-        placeholder: 'Phone Number (+1234567890)',
+        placeholder: 'Phone Number (10-digit)',
         value: '',
         valid: false,
         touched: false,
@@ -38,6 +41,8 @@ class SmsForm extends Component {
       },
     },
     formValid: false,
+    submitting: false,
+    submitSuccess: null
   }
 
   inputChangeHandler = (event, id) => {
@@ -76,12 +81,11 @@ class SmsForm extends Component {
           errors.push('Required');
         }
         const isPhoneNumber = this.state.form.phone.value.match(
-          /[+][0-9]{11}/
+          /[0-9]{10}/
         );
         if (!isPhoneNumber) {
           errors.push(
-            `Please enter a valid 10-digit phone number 
-            in the form of +1234567890`
+            `Please enter a valid 10-digit phone number`
           );
         }
         fieldValid = hasPhone && isPhoneNumber;
@@ -113,21 +117,28 @@ class SmsForm extends Component {
     this.setState({ formValid });
   }
 
-  submitForm = async () => {
+  submitForm = () => {
     const time = new Date(this.state.form.time.value).valueOf();
     const formData = {
       type: 'sms',
       time: time,
       message: {
-        to: this.state.form.phone.value,
+        to: `+1${this.state.form.phone.value}`,
         body: this.state.form.body.value
       }
     };
-    await axios.post('/api/reminders', formData);
-    if (this.props.auth) {
-      await this.props.fetchReminders();
-    }
-    this.props.close();
+    this.setState({ submitting: true }, () => {
+      axios.post('/api/reminders', formData)
+        .then(() => {
+          if (this.props.auth) {
+            this.props.fetchReminders();
+          }
+          this.setState({ submitting: false, submitSuccess: true });
+        })
+        .catch(() => {
+          this.setState({ submitting: false, submitSuccess: false });
+        });
+    });
   }
 
   renderForm() {
@@ -159,6 +170,7 @@ class SmsForm extends Component {
 
     return (
         <form>
+          <h5>Schedule a Text Reminder</h5>
           {formFields}
           <div className='row'>
             <div className='col s6'>
@@ -178,10 +190,20 @@ class SmsForm extends Component {
   }
 
   render() {
+    let content = null;
+    if (this.state.submitting) {
+      content = <SubmitSpinner />;
+    } else if (this.state.submitSuccess != null) {
+      content = this.state.submitSuccess
+        ? <SubmitSuccess confirmed={this.props.close} />
+        : <SubmitError confirmed={this.props.close} />;
+    } else {
+      content = this.renderForm();
+    }
+
     return (
       <div className='ReminderForm'>
-        <h5>Schedule a Text Reminder</h5>
-        {this.renderForm()}
+        {content}
       </div>
     );
   }

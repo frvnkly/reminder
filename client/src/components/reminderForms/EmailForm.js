@@ -4,6 +4,9 @@ import axios from 'axios';
 
 import './ReminderForm.css';
 import FormError from './FormError';
+import SubmitSpinner from './SubmitSpinner';
+import SubmitSuccess from './SubmitSuccess';
+import SubmitError from './SubmitError';
 import { fetchReminders } from '../../actions/reminderActions';
 
 class EmailForm extends Component {
@@ -47,6 +50,8 @@ class EmailForm extends Component {
       },
     },
     formValid: false,
+    submitting: false,
+    submitSuccess: null
   }
 
   inputChangeHandler = (event, id) => {
@@ -120,23 +125,29 @@ class EmailForm extends Component {
     this.setState({ formValid });
   }
 
-  submitForm = async () => {
+  submitForm = () => {
     const time = new Date(this.state.form.time.value).valueOf();
     const formData = {
       type: 'email',
       time: time,
       message: {
         to: this.state.form.email.value,
-        from: this.state.form.email.value,
         subject: this.state.form.subject.value,
         text: this.state.form.body.value
       }
     };
-    await axios.post('/api/reminders', formData);
-    if (this.props.auth) {
-      await this.props.fetchReminders();
-    }
-    this.props.close();
+    this.setState({ submitting: true }, () => {
+      axios.post('/api/reminders', formData)
+        .then(() => {
+          if (this.props.auth) {
+            this.props.fetchReminders();
+          }
+          this.setState({ submitting: false, submitSuccess: true });
+        })
+        .catch(() => {
+          this.setState({ submitting: false, submitSuccess: false });
+        });
+    });
   }
 
   renderForm() {
@@ -167,30 +178,41 @@ class EmailForm extends Component {
     }
 
     return (
-        <form>
-          {formFields}
-          <div className='row'>
-            <div className='col s6'>
-              <a className='btn' onClick={this.props.close}>Cancel</a>
-            </div>
-            <div className='col s6'>
-              <a 
-                className='btn' 
-                onClick={this.submitForm} 
-                disabled={!this.state.formValid}>
-                  Submit
-              </a>
-            </div>
+      <form>
+        <h5>Schedule an Email Reminder</h5>
+        {formFields}
+        <div className='row'>
+          <div className='col s6'>
+            <a className='btn' onClick={this.props.close}>Cancel</a>
           </div>
-        </form>
+          <div className='col s6'>
+            <a 
+              className='btn' 
+              onClick={this.submitForm} 
+              disabled={!this.state.formValid}>
+                Submit
+            </a>
+          </div>
+        </div>
+      </form>
     );
   }
 
   render() {
+    let content = null;
+    if (this.state.submitting) {
+      content = <SubmitSpinner />;
+    } else if (this.state.submitSuccess != null) {
+      content = this.state.submitSuccess
+        ? <SubmitSuccess confirmed={this.props.close} />
+        : <SubmitError confirmed={this.props.close} />;
+    } else {
+      content = this.renderForm();
+    }
+
     return (
       <div className='ReminderForm'>
-        <h5>Schedule an Email Reminder</h5>
-        {this.renderForm()}
+        {content}
       </div>
     );
   }
