@@ -54,6 +54,10 @@ class EmailForm extends Component {
     submitSuccess: null
   }
 
+  componentDidMount() {
+    this.retrieveEmail();
+  }
+
   inputChangeHandler = (event, id) => {
     const updatedValue = event.target.value;
     this.setState(prevState => {
@@ -142,12 +146,41 @@ class EmailForm extends Component {
           if (this.props.auth) {
             this.props.fetchReminders();
           }
+          this.saveEmail(this.state.form.email.value);
           this.setState({ submitting: false, submitSuccess: true });
         })
         .catch(() => {
           this.setState({ submitting: false, submitSuccess: false });
         });
     });
+  }
+
+  saveEmail(email) {
+    const storage = window.localStorage;
+    if (storage) {
+      storage.setItem('email', email);
+    }
+  }
+
+  retrieveEmail = () => {
+    const storage = window.localStorage;
+    if (storage) {
+      const savedEmail = storage.getItem('email');
+      if (savedEmail) {
+        this.setState(prevState => {
+          return { 
+            form: {
+              ...prevState.form, 
+              email: {
+                ...prevState.form.email,
+                value: savedEmail,
+                valid: true 
+              } 
+            } 
+          }
+        });
+      }
+    }
   }
 
   renderForm() {

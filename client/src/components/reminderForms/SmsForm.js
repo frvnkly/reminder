@@ -45,6 +45,10 @@ class SmsForm extends Component {
     submitSuccess: null
   }
 
+  componentDidMount() {
+    this.retrievePhone();
+  }
+
   inputChangeHandler = (event, id) => {
     const updatedValue = event.target.value;
     this.setState(prevState => {
@@ -133,12 +137,41 @@ class SmsForm extends Component {
           if (this.props.auth) {
             this.props.fetchReminders();
           }
+          this.savePhone(this.state.form.phone.value);
           this.setState({ submitting: false, submitSuccess: true });
         })
         .catch(() => {
           this.setState({ submitting: false, submitSuccess: false });
         });
     });
+  }
+
+  savePhone(phone) {
+    const storage = window.localStorage;
+    if (storage) {
+      storage.setItem('phone', phone);
+    }
+  }
+
+  retrievePhone = () => {
+    const storage = window.localStorage;
+    if (storage) {
+      const savedPhone = storage.getItem('phone');
+      if (savedPhone) {
+        this.setState(prevState => {
+          return { 
+            form: {
+              ...prevState.form, 
+              phone: {
+                ...prevState.form.phone,
+                value: savedPhone,
+                valid: true 
+              } 
+            } 
+          }
+        });
+      }
+    }
   }
 
   renderForm() {
