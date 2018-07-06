@@ -49,7 +49,7 @@ class Header extends Component {
                 ? <li><a href='auth/logout'>Logout</a></li>
                 : <React.Fragment>
                     <li><a href='/auth/google/'>Login with Google</a></li>
-                    <li><a>Login with Facebook</a></li>
+                    <li><a href='/auth/twitter/'>Login with Twitter</a></li>
                   </React.Fragment>}
             </ul>
           </div>
