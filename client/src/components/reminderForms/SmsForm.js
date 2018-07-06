@@ -204,6 +204,10 @@ class SmsForm extends Component {
     return (
         <form>
           <h5>Schedule a Text Reminder</h5>
+          <p>
+            *This app uses a trial of Twilio and will only service 
+            certain numbers. Sorry for the inconvenience.
+          </p>
           {formFields}
           <div className='row'>
             <div className='col s6'>

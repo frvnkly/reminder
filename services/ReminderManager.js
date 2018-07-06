@@ -57,7 +57,9 @@ class ReminderManager {
         if (!reminder.body) {
           reminder.body = 'Reminder';
         }
-        reminder.body += '\n\n**LATE**';
+        reminder.body += 
+          '\n\n*This reminder may have been delivered late. ' +
+          'Sorry for the inconvenience.*';
         this._sendReminder(reminder);
         this._cleanUpReminder(reminder._id);
       } else {  // queue up pending reminders
